@@ -10,7 +10,8 @@ fb_refresh:
 	@$(CC) fb_refresh.c $(CFLAGS) -o $(OUT) > /dev/null 2>&1
 	@echo "  CHMOD  $(OUT)"
 	@chmod +x $(OUT)
-	@echo "Your aarch64 binary is ready in $(OUT)"
+	@echo "Your aarch64 binary is ready in: $(OUT)"
+	@file $(OUT)
 
 clean:
 	@echo "  CLEAN  $(OUT)"
