@@ -1,6 +1,7 @@
 /*
  * Authors:  Alan Hourihane, <alanh@fairlite.demon.co.uk>
  *	     Michel Dänzer, <michel@tungstengraphics.com>
+ 			Ardaninho
  */
 
 #ifdef HAVE_CONFIG_H
@@ -899,6 +900,7 @@ FBDevScreenInit(ScreenPtr pScreen, int argc, char **argv)
 		visual = pScreen->visuals + pScreen->numVisuals;
 		while (--visual >= pScreen->visuals) {
 			if ((visual->class | DynamicClass) == DirectColor) {
+				/* Ardaninho change here */
 				visual->offsetRed   = pScrn->offset.blue;
 				visual->offsetGreen = pScrn->offset.green;
 				visual->offsetBlue  = pScrn->offset.red;
