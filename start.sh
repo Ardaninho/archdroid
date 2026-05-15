@@ -131,11 +131,11 @@ enter_chroot_de() {
   if [ "$ENABLE_LOG" -eq 1 ]; then
     info "DE logs -> stdout/stderr (logging enabled)"
     chroot "$MNT" /usr/bin/env -i $CHROOT_ENV /bin/bash -c \
-      "chmod 000 /dev/video*; mkdir -p /run/dbus && dbus-daemon --system --fork; fb_refresh $FB_DEV $FB_HZ & startx"
+      "chmod 000 /dev/video*; mkdir -p /run/dbus && dbus-daemon --system --fork; su ardaninho -c 'fb_refresh $FB_DEV $FB_HZ & startx'"
   else
     info "DE logs suppressed (--no-log mode)"
     chroot "$MNT" /usr/bin/env -i $CHROOT_ENV /bin/bash -c \
-      "chmod 000 /dev/video*; mkdir -p /run/dbus && dbus-daemon --system --fork; fb_refresh $FB_DEV $FB_HZ > /dev/null 2>&1 & startx"
+      "chmod 000 /dev/video*; mkdir -p /run/dbus && dbus-daemon --system --fork; su ardaninho -c 'fb_refresh $FB_DEV $FB_HZ > /dev/null 2>&1 & startx'"
   fi
 
   resume_android_ui
