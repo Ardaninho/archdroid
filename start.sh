@@ -4,17 +4,19 @@ IMG="/data/media/0/archdroid/linux.img"
 LOOP="/dev/block/loop0"
 MNT="/mnt/archdroid"
 LOG="/data/media/0/archdroid/archdroid.log"
-CHROOT_ENV="HOME=/root PATH=/usr/bin:/usr/sbin:/usr/local/bin:/bin:/sbin DISPLAY=:0 XDG_RUNTIME_DIR=/tmp"
+CHROOT_ENV="HOME=/root PATH=/usr/bin:/usr/sbin:/usr/local/bin:/bin:/sbin DISPLAY=:0 XDG_RUNTIME_DIR=/tmp TERM=vt100"
 FB_DEV="/dev/graphics/fb0"
 FB_HZ=60
 
 ENABLE_LOG=1
 START_DE=1
+UMOUNT_DRIVES=1
 
 for arg in "$@"; do
   case "$arg" in
     --no-log) ENABLE_LOG=0 ;;
     --no-de)  START_DE=0 ;;
+    --do-not-umount) UMOUNT_DRIVES=0 ;;
   esac
 done
 
@@ -97,6 +99,42 @@ mount_pseudo() {
   _bind_mount tmpfs  tmpfs  "$MNT/tmp"
 }
 
+unmount_pseudo() {
+  info "=== Unmounting pseudo filesystems ==="
+
+  _safe_umount() {
+    local dst="$1"
+    if mountpoint -q "$dst" 2>/dev/null; then
+      run "Unmounting $dst" umount -l "$dst"
+    else
+      warn "$dst not mounted, skipping"
+    fi
+  }
+
+  _safe_umount "$MNT/tmp"
+  _safe_umount "$MNT/dev/pts"
+  _safe_umount "$MNT/dev"
+  _safe_umount "$MNT/sys"
+  _safe_umount "$MNT/proc"
+  _safe_umount "$MNT/run"
+}
+
+unmount_disk() {
+  info "=== Unmounting virtual disk ==="
+
+  if mountpoint -q "$MNT" 2>/dev/null; then
+    run "Unmounting ext4 image at $MNT" umount -l "$MNT"
+  else
+    warn "$MNT not mounted, skipping"
+  fi
+
+  if losetup "$LOOP" 2>/dev/null | grep -q "$IMG"; then
+    run "Detaching loop device $LOOP" losetup -d "$LOOP"
+  else
+    warn "Loop device $LOOP not set up, skipping"
+  fi
+}
+
 wake_screen() {
   if dumpsys power | grep -q "mWakefulness=Awake"; then
     echo "Screen is already awake"
@@ -149,7 +187,8 @@ enter_chroot_shell() {
 
 main() {
   [ "$ENABLE_LOG" -eq 1 ] && info "Log file: $LOG"
-  info "Starting archdroid (flags: ENABLE_LOG=$ENABLE_LOG START_DE=$START_DE)"
+  info "Starting archdroid version 0.1 (flags: ENABLE_LOG=$ENABLE_LOG START_DE=$START_DE UMOUNT_DRIVES=$UMOUNT_DRIVES)"
+  info "Copyright (C) 2026 Ardaninho <https://github.com/Ardaninho>. All rights reserved."
 
   mount_disk
   mount_pseudo
@@ -158,6 +197,14 @@ main() {
     enter_chroot_de
   else
     enter_chroot_shell
+  fi
+
+  if [ "$UMOUNT_DRIVES" -eq 1 ]; then
+    unmount_pseudo
+    unmount_disk
+    info "Disks unmounted"
+  else
+    info "Not unmounting disks (specified --do-not-umount)"
   fi
 
   info "=== archdroid session ended ==="
