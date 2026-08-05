@@ -1,3 +1,6 @@
+# Copyright (C) 2026 Ardaninho
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Mount Virtual Disk
 losetup /dev/block/loop0 /data/media/0/archdroid/linux.img # ANDROID SHELL
 mkdir /mnt/archdroid # ANDROID SHELL

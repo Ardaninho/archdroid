@@ -1,4 +1,6 @@
 #!/system/bin/sh
+# Copyright (C) 2026 Ardaninho
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 IMG="/data/media/0/archdroid/linux.img"
 LOOP="/dev/block/loop0"

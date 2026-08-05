@@ -1,3 +1,6 @@
+# Copyright (C) 2026 Ardaninho
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 CC = aarch64-linux-gnu-gcc
 CFLAGS = -static
 OUT = build/fb_refresh
